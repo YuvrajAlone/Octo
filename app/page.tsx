@@ -9,6 +9,7 @@ import {
   MicIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAppContext } from "@/app/context/AppContext";
 
 const homeTags = [
   "Portfolio Website",
@@ -23,11 +24,11 @@ const homeTags = [
 ];
 
 export default function Home() {
+  const { generatingProject, generateWebsite } = useAppContext();
   const { isSignedIn, isLoaded } = useUser();
   const [visible, setVisible] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
   const [loginMessage, setLoginMessage] = useState(false);
   const autoFocus = true;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -56,31 +57,9 @@ export default function Home() {
       return;
     }
 
-    if (!input.trim() || loading) return;
+    if (!input.trim() || generatingProject) return;
 
-    try {
-      setLoading(true);
-
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: input.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate website");
-      }
-
-      const data = await response.json();
-      router.push(`/builder/${data.id}`);
-      console.log(data);
-    } catch (error) {
-      console.error("Error generating website:", error);
-    } finally {
-      setLoading(false);
-    }
+    await generateWebsite(input);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -192,7 +171,7 @@ export default function Home() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Articulate your vision..."
-            disabled={loading}
+            disabled={generatingProject}
             rows={2}
             className="w-full p-4 pb-0 resize-none placeholder:text-white/40 outline-none bg-transparent text-white text-base scrollbar-none"
           />
@@ -215,10 +194,10 @@ export default function Home() {
 
               <button
                 type="submit"
-                disabled={!input.trim() || loading}
+                disabled={!input.trim() || generatingProject}
                 className="flex items-center justify-center p-1.5 rounded-full bg-zinc-200 text-black hover:bg-white disabled:opacity-40 cursor-pointer"
               >
-                {loading ? (
+                {generatingProject ? (
                   <Loader2Icon size={18} className="animate-spin" />
                 ) : (
                   <ArrowRightIcon size={18} />
@@ -235,7 +214,7 @@ export default function Home() {
               <button
                 key={i}
                 onClick={() => handleGenerate(tag)}
-                disabled={loading}
+                disabled={generatingProject}
                 className="shrink-0 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-white/20 cursor-pointer"
               >
                 {tag}
