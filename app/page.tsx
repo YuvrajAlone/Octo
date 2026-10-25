@@ -7,6 +7,8 @@ import {
   Loader2Icon,
   ArrowRightIcon,
   MicIcon,
+  FolderOpenIcon,
+  Loader,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/app/context/AppContext";
@@ -24,9 +26,16 @@ const homeTags = [
 ];
 
 export default function Home() {
-  const { generatingProject, generateWebsite } = useAppContext();
+  const {
+    generatingProject,
+    generateWebsite,
+    projects,
+    getProjects,
+    loadingProjects,
+  } = useAppContext();
   const { isSignedIn, isLoaded } = useUser();
   const [visible, setVisible] = useState(false);
+  const [recents, setRecents] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [input, setInput] = useState("");
   const [loginMessage, setLoginMessage] = useState(false);
@@ -92,7 +101,7 @@ export default function Home() {
     <main className="relative min-h-screen overflow-hidden">
       {/* navbar */}
       <div
-        className="fixed inset-y-0 right-0 z-50 w-[10vw]"
+        className="fixed inset-y-0 right-0 z-50 w-[15vw]"
         onMouseEnter={showButton}
         onFocus={showButton}
       >
@@ -103,7 +112,10 @@ export default function Home() {
         >
           {isLoaded && isSignedIn && (
             <button
-              onClick={() => router.push("/recents")}
+              onClick={() => {
+                setRecents(true);
+                getProjects();
+              }}
               type="button"
               className="flex items-center gap-2 px-6 py-2 text-sm text-white/50 hover:text-white/70 hover:text-left cursor-pointer"
             >
@@ -159,6 +171,7 @@ export default function Home() {
             Describe your idea. OCTO will turn it into a website.
           </p>
         )}
+
         {/* prompt input */}
         <form
           ref={formRef}
@@ -223,6 +236,78 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* recents */}
+      {recents && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center pt-[8vh]">
+          <div className="absolute inset-0" onClick={() => setRecents(false)} />
+          <div className="relative z-10 h-[90vh] w-[45vw] rounded-2xl border border-white/10 bg-white/3 shadow-2xl backdrop-blur-md">
+            <div className="relative">
+              <h2 className="p-4 text-xl text-center text-white mr-2">
+                Recents
+              </h2>
+
+              <button
+                onClick={() => setRecents(false)}
+                className="absolute right-6 top-4.5 text-white/60 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* lists */}
+            <div className="h-[75vh] overflow-y-auto p-4">
+              {loadingProjects ? (
+                <div className="flex h-full items-center justify-center">
+                  <Loader className="size-7 animate-spin [animation-duration:2s] text-zinc-400" />
+                </div>
+              ) : projects.length === 0 ? (
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <div className=" flex size-10 items-center justify-center ">
+                    <FolderOpenIcon className="size-6 text-zinc-400" />
+                  </div>
+                  <p className="text-sm font-medium text-zinc-200">
+                    No projects yet
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-500">
+                    Your recents will appear here.
+                  </p>
+
+                  <button
+                    onClick={() => setRecents(false)}
+                    className="mt-2 text-sm text-zinc-500 underline underline-offset-4 transition-colors hover:text-zinc-300/70 cursor-pointer"
+                  >
+                    Let's begin !
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {projects.map((project) => (
+                    <div
+                      onClick={() => router.push(`/builder/${project.id}`)}
+                      key={project.id}
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-white/8 bg-zinc-900/70 p-4 backdrop-blur-xl transition hover:bg-zinc-800/80 hover:border-white/10 cursor-pointer"
+                    >
+                      <h3 className="truncate text-sm font-medium text-zinc-100">
+                        {project.name}
+                      </h3>
+
+                      <button
+                        type="button"
+                        onClick={() => router.push(`/builder/${project.id}`)}
+                        className="flex size-5 items-center justify-cente text-zinc-300 cursor-pointer "
+                        aria-label={`Open ${project.name}`}
+                      >
+                        <ArrowRightIcon className="size-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       <StructureFlow />
     </main>
