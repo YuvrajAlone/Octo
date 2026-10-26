@@ -9,6 +9,7 @@ import {
   MicIcon,
   FolderOpenIcon,
   Loader,
+  Trash2Icon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/app/context/AppContext";
@@ -32,6 +33,8 @@ export default function Home() {
     projects,
     getProjects,
     loadingProjects,
+    deleteProject,
+    loadDeleteProject,
   } = useAppContext();
   const { isSignedIn, isLoaded } = useUser();
   const [visible, setVisible] = useState(false);
@@ -43,6 +46,7 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const [deleteModal, setDeleteModal] = useState<string | null>(null);
 
   useEffect(() => {
     if (autoFocus && textareaRef.current) {
@@ -292,18 +296,84 @@ export default function Home() {
                         {project.name}
                       </h3>
 
-                      <button
-                        type="button"
-                        onClick={() => router.push(`/builder/${project.id}`)}
-                        className="flex size-5 items-center justify-cente text-zinc-300 cursor-pointer "
-                        aria-label={`Open ${project.name}`}
-                      >
-                        <ArrowRightIcon className="size-4" />
-                      </button>
+                      <div className="flex shrink-0 items-center gap-3">
+                        {loadDeleteProject === project.id ? (
+                          <Loader2Icon className="size-4 animate-spin" />
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteModal(project.id);
+                            }}
+                            className="flex size-5 cursor-pointer items-center justify-center text-zinc-500 transition hover:text-red-400"
+                            aria-label={`Delete ${project.name}`}
+                          >
+                            <Trash2Icon className="size-4" />
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/builder/${project.id}`);
+                          }}
+                          className="flex size-5 items-center justify-cente text-zinc-300 cursor-pointer "
+                          aria-label={`Open ${project.name}`}
+                        >
+                          <ArrowRightIcon className="size-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* delete */}
+      {deleteModal && (
+        <div
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setDeleteModal(null)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl border border-white/10 bg-zinc-950/95 p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-medium text-white">Delete project?</h2>
+
+            <p className="mt-2 text-sm leading-6 text-zinc-400">
+              Are you sure you want to delete{" "}
+              <span className="text-zinc-200">
+                {projects.find((project) => project.id === deleteModal)?.name}
+              </span>
+              ? This action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-1.5">
+              <button
+                type="button"
+                onClick={() => setDeleteModal(null)}
+                className="rounded-4xl px-4 py-2 text-sm text-zinc-400 transition hover:bg-white/5 hover:text-white"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  setDeleteModal(null);
+                  await deleteProject(deleteModal);
+                }}
+                disabled={loadDeleteProject === deleteModal}
+                className="rounded-4xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/20 disabled:opacity-50"
+              >
+                Delete
+              </button>
             </div>
           </div>
         </div>

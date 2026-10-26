@@ -20,6 +20,8 @@ type AppContextType = {
   projects: Project[];
   getProjects: () => Promise<void>;
   loadingProjects: boolean;
+  loadDeleteProject: string | null;
+  deleteProject: (id: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -30,6 +32,9 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   const [generatingProject, setGeneratingProject] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadDeleteProject, setLoadDeleteProject] = useState<string | null>(
+    null,
+  );
 
   const generateWebsite = async (prompt: string) => {
     if (!prompt.trim() || generatingProject) return;
@@ -80,6 +85,26 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteProject = async (id: string) => {
+    try {
+      setLoadDeleteProject(id);
+
+      const response = await fetch(`/api/projects/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete project");
+      }
+
+      setProjects((prev) => prev.filter((project) => project.id !== id));
+    } catch (error) {
+      console.error("Error deleting project:", error);
+    } finally {
+      setLoadDeleteProject(null);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -88,6 +113,8 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         projects,
         getProjects,
         loadingProjects,
+        deleteProject,
+        loadDeleteProject,
       }}
     >
       {children}
