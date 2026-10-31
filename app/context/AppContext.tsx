@@ -12,6 +12,7 @@ type Project = {
   published: boolean;
   createdAt: string;
   updatedAt: string;
+  files: Record<string, string | { content?: string }>;
 };
 
 type AppContextType = {
@@ -22,6 +23,13 @@ type AppContextType = {
   loadingProjects: boolean;
   loadDeleteProject: string | null;
   deleteProject: (id: string) => Promise<void>;
+  activeProject: Project | null;
+  activeFile: string;
+  setActiveFile: React.Dispatch<React.SetStateAction<string>>;
+  loadingActiveProject: boolean;
+  loadProject: (id: string, silent?: boolean) => Promise<void>;
+  showCode: boolean;
+  setShowCode: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -35,6 +43,10 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
   const [loadDeleteProject, setLoadDeleteProject] = useState<string | null>(
     null,
   );
+  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [activeFile, setActiveFile] = useState("");
+  const [loadingActiveProject, setLoadingActiveProject] = useState(false);
+  const [showCode, setShowCode] = useState(false);
 
   const generateWebsite = async (prompt: string) => {
     if (!prompt.trim() || generatingProject) return;
@@ -58,7 +70,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
 
       const data: { id: string } = await response.json();
 
-      router.push(`/builder/${data.id}`);
+      router.push(`/workspace/${data.id}`);
     } catch (error) {
       console.error("Error generating website:", error);
     } finally {
@@ -105,6 +117,36 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const loadProject = async (id: string, silent = false) => {
+    if (!silent) setLoadingActiveProject(true);
+
+    try {
+      const response = await fetch(`/api/projects/${id}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to load project");
+      }
+
+      const data = await response.json();
+
+      setActiveProject(data);
+
+      const files = Object.keys(data.files ?? {});
+
+      if (files.length > 0) {
+        setActiveFile((prev) => {
+          if (files.includes(prev)) return prev;
+          if (files.includes("/App.js")) return "/App.js";
+          return files[0];
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load project:", error);
+    } finally {
+      if (!silent) setLoadingActiveProject(false);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -115,6 +157,13 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         loadingProjects,
         deleteProject,
         loadDeleteProject,
+        activeProject,
+        activeFile,
+        setActiveFile,
+        loadingActiveProject,
+        loadProject,
+        setShowCode,
+        showCode,
       }}
     >
       {children}

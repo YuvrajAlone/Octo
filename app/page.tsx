@@ -247,7 +247,7 @@ export default function Home() {
           <div className="absolute inset-0" onClick={() => setRecents(false)} />
           <div className="relative z-10 h-[90vh] w-[45vw] rounded-2xl border border-white/10 bg-white/3 shadow-2xl backdrop-blur-md">
             <div className="relative">
-              <h2 className="p-4 text-xl text-center text-white mr-2">
+              <h2 className="p-4 pb-2 text-xl text-center text-white mr-2">
                 Recents
               </h2>
 
@@ -260,7 +260,7 @@ export default function Home() {
             </div>
 
             {/* lists */}
-            <div className="h-[75vh] overflow-y-auto p-4">
+            <div className="h-[80vh] overflow-y-auto px-4 scrollbar-none">
               {loadingProjects ? (
                 <div className="flex h-full items-center justify-center">
                   <Loader className="size-7 animate-spin [animation-duration:2s] text-zinc-400" />
@@ -288,7 +288,10 @@ export default function Home() {
                 <div className="space-y-3">
                   {projects.map((project) => (
                     <div
-                      onClick={() => router.push(`/builder/${project.id}`)}
+                      onClick={() => {
+                        router.push(`/workspace/${project.id}`);
+                        setRecents(false);
+                      }}
                       key={project.id}
                       className="flex items-center justify-between gap-4 rounded-2xl border border-white/8 bg-zinc-900/70 p-4 backdrop-blur-xl transition hover:bg-zinc-800/80 hover:border-white/10 cursor-pointer"
                     >
@@ -317,7 +320,8 @@ export default function Home() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/builder/${project.id}`);
+                            router.push(`/workspace/${project.id}`);
+                            setRecents(false);
                           }}
                           className="flex size-5 items-center justify-cente text-zinc-300 cursor-pointer "
                           aria-label={`Open ${project.name}`}

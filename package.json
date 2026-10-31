@@ -15,7 +15,9 @@
     "@neondatabase/serverless": "^1.2.0",
     "dotenv": "^18.0.8",
     "drizzle-orm": "^0.45.4",
+    "file-saver": "^2.0.5",
     "inngest": "^4.25.0",
+    "jszip": "^3.10.2",
     "lucide-react": "^1.61.0",
     "next": "16.4.2",
     "react": "19.3.0",
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
