@@ -1,18 +1,17 @@
 "use client";
-import { useEffect, useRef, useState, ComponentProps } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import StructureFlow from "../app/components/StructureFlow";
+import StructureFlow from "@/src/components/StructureFlow";
 import {
-  CloudUploadIcon,
   Loader2Icon,
   ArrowRightIcon,
-  MicIcon,
   FolderOpenIcon,
   Loader,
   Trash2Icon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/app/context/AppContext";
+import { useAppContext } from "@/src/context/AppContext";
+import PromptInput from "@/src/components/PromptInput";
 
 const homeTags = [
   "Portfolio Website",
@@ -40,46 +39,20 @@ export default function Home() {
   const [visible, setVisible] = useState(false);
   const [recents, setRecents] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [input, setInput] = useState("");
-  const [loginMessage, setLoginMessage] = useState(false);
-  const autoFocus = true;
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
-  const formRef = useRef<HTMLFormElement>(null);
   const [deleteModal, setDeleteModal] = useState<string | null>(null);
+  const [loginMessage, setLoginMessage] = useState(false);
 
-  useEffect(() => {
-    if (autoFocus && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [autoFocus]);
-
-  const handleGenerate = (tag: string) => {
-    setInput(tag);
-    requestAnimationFrame(() => {
-      formRef.current?.requestSubmit();
-    });
-  };
-
-  const handleSubmit: ComponentProps<"form">["onSubmit"] = async (e) => {
-    e.preventDefault();
+  const handleGenerate = async (prompt: string) => {
+    if (!isLoaded) return false;
 
     if (!isSignedIn) {
       setLoginMessage(true);
-      setInput("");
-      return;
+      return false;
     }
 
-    if (!input.trim() || generatingProject) return;
-
-    await generateWebsite(input);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      e.currentTarget.form?.requestSubmit();
-    }
+    await generateWebsite(prompt);
+    return true;
   };
 
   function showButton() {
@@ -168,61 +141,13 @@ export default function Home() {
           Build Websites with AI
         </h2>
 
-        {loginMessage ? (
-          <p className="mt-3 text-sm text-white/60">Sign in to begin.</p>
-        ) : (
-          <p className="mt-3 text-sm text-white/50">
-            Describe your idea. OCTO will turn it into a website.
-          </p>
-        )}
-
         {/* prompt input */}
-        <form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className="mt-5 w-full max-w-2xl bg-white/3 backdrop-blur-xl rounded-xl ring-1 ring-white/10 overflow-hidden transition"
-        >
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Articulate your vision..."
-            disabled={generatingProject}
-            rows={2}
-            className="w-full p-4 pb-0 resize-none placeholder:text-white/40 outline-none bg-transparent text-white text-base scrollbar-none"
-          />
-
-          <div className="flex items-center justify-between pb-3 px-3 gap-2">
-            <label
-              htmlFor="file"
-              className="border border-white/20 text-white/80 hover:text-white hover:border-white/30 p-1.5 rounded-md cursor-pointer flex items-center justify-center"
-            >
-              <input type="file" id="file" hidden />
-              <CloudUploadIcon size={18} />
-            </label>
-            <div className="flex items-center justify-end gap-2">
-              <button
-                type="button"
-                className="flex items-center justify-center p-1 text-white/70 hover:text-white cursor-pointer"
-              >
-                <MicIcon size={18} />
-              </button>
-
-              <button
-                type="submit"
-                disabled={!input.trim() || generatingProject}
-                className="flex items-center justify-center p-1.5 rounded-full bg-zinc-200 text-black hover:bg-white disabled:opacity-40 cursor-pointer"
-              >
-                {generatingProject ? (
-                  <Loader2Icon size={18} className="animate-spin" />
-                ) : (
-                  <ArrowRightIcon size={18} />
-                )}
-              </button>
-            </div>
-          </div>
-        </form>
+        <PromptInput
+          onSubmit={handleGenerate}
+          loading={generatingProject}
+          variant="glass"
+          loginMessage={loginMessage}
+        />
 
         {/* Scrolling Marquee tags */}
         <div className="masked-marquee mt-3 w-full max-w-2xl overflow-hidden py-1">

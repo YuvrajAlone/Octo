@@ -37,6 +37,72 @@ const initialProjects = [
           "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
         timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
       },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        role: "assistant",
+        content:
+          "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
+        timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
+      },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        role: "assistant",
+        content:
+          "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
+        timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
+      },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        role: "assistant",
+        content:
+          "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
+        timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
+      },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        role: "assistant",
+        content:
+          "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
+        timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
+      },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
+      {
+        role: "assistant",
+        content:
+          "I have built the SaaSify landing page with a modern design system including Hero, Features, Pricing, and Testimonial components.",
+        timestamp: new Date(Date.now() - 86400000 * 2 + 5000).toISOString(),
+      },
+      {
+        role: "user",
+        content:
+          "Create a modern SaaS landing page for an AI productivity platform called SaaSify",
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString(),
+      },
     ],
     files: {
       "/App.js": `import React from 'react';

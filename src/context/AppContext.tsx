@@ -3,6 +3,15 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+type ChatResponse = Project & {
+  errors?: string[];
+};
+
 type Project = {
   id: string;
   name: string;
@@ -13,6 +22,7 @@ type Project = {
   createdAt: string;
   updatedAt: string;
   files: Record<string, string | { content?: string }>;
+  messages: Message[];
 };
 
 type AppContextType = {
@@ -30,13 +40,15 @@ type AppContextType = {
   loadProject: (id: string, silent?: boolean) => Promise<void>;
   showCode: boolean;
   setShowCode: React.Dispatch<React.SetStateAction<boolean>>;
+  chatLoading: boolean;
+  handleChat: (prompt: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-
+  const [chatLoading, setChatLoading] = useState(false);
   const [generatingProject, setGeneratingProject] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
@@ -44,7 +56,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeFile, setActiveFile] = useState("");
+  const [activeFile, setActiveFile] = useState("/App.js");
   const [loadingActiveProject, setLoadingActiveProject] = useState(false);
   const [showCode, setShowCode] = useState(false);
 
@@ -147,6 +159,36 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const handleChat = async (prompt: string): Promise<void> => {
+    if (!activeProject || !prompt.trim() || chatLoading) return;
+
+    setChatLoading(true);
+
+    try {
+      const response = await fetch(`/api/projects/${activeProject.id}/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update project");
+      }
+
+      const data: ChatResponse = await response.json();
+
+      setActiveProject(data);
+    } catch (error) {
+      console.error("Revision request failed:", error);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -164,6 +206,8 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         loadProject,
         setShowCode,
         showCode,
+        chatLoading,
+        handleChat,
       }}
     >
       {children}

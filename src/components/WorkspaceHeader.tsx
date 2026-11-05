@@ -27,11 +27,11 @@ export default function WorkspaceHeader({
   const router = useRouter();
 
   return (
-    <header className="relative z-40 grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-4 backdrop-blur-xl">
+    <header className="relative z-40 grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-4 backdrop-blur-">
       {/* Left - Logo & Brand */}
       <button
         onClick={() => router.push("/")}
-        className="flex cursor-pointer items-center gap-2"
+        className="flex w-fit cursor-pointer items-center gap-2 justify-self-start"
       >
         <Image
           src="/favicon.ico"
@@ -56,7 +56,7 @@ export default function WorkspaceHeader({
         {/* Code / Preview */}
         <button
           onClick={() => onToggleShowCode(true)}
-          className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg  px-2 py-1.5 text-xs font-medium text-zinc-400 transition-transform duration-200 hover:scale-110 hover:text-white/80"
+          className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg  px-2 py-1.5 text-xs font-medium text-zinc-400 transition-opacity duration-200 hover:scale-110 hover:text-white/80"
         >
           {showCode ? (
             <>
@@ -74,7 +74,7 @@ export default function WorkspaceHeader({
         {/* Open Preview */}
         <button
           onClick={onOpenPreview}
-          className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-400 transition-transform duration-200 hover:scale-110 hover:text-white/80"
+          className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-400 transition-opacity duration-200 hover:scale-110 hover:text-white/80"
         >
           <ExternalLinkIcon size={16} />
           Open Preview
@@ -83,7 +83,7 @@ export default function WorkspaceHeader({
         {/* Download */}
         <button
           onClick={onDownload}
-          className="inline-flex cursor-pointer items-center justify-center rounded-lg px-2 py-1.5 text-zinc-400 transition-transform duration-200 hover:scale-110 hover:text-white/80"
+          className="inline-flex cursor-pointer items-center justify-center rounded-lg px-2 py-1.5 text-zinc-400 transition-opacity duration-200 hover:scale-110 hover:text-white/80"
         >
           <DownloadIcon size={16} />
         </button>
