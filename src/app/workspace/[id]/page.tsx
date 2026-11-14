@@ -10,7 +10,8 @@ import ProtectedRoute from "@/src/components/ProtectedRoute";
 import { exportProjectZip } from "@/src/utils/exportProject";
 import ChatPanel from "@/src/components/ChatPanel";
 import FileExplorer from "@/src/components/FileExplorer";
-// import { Group, Panel, Separator } from "react-resizable-panels";
+import PreviewPanel from "@/src/components/PreviewPanel";
+import AgentProgressDashboard from "@/src/components/AgentProgressDashboard";
 
 export default function Page() {
   return (
@@ -68,14 +69,16 @@ function Workspace() {
         onToggleShowCode={() => setShowCode(!showCode)}
         onOpenPreview={handleOpenPreview}
         onDownload={handleDownload}
+        LeftTab={() =>
+          setLeftTab((prev) => (prev === "files" ? "chat" : "files"))
+        }
       ></WorkspaceHeader>
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <div className="w-87.5 shrink-0 flex flex-col min-h-0 ">
-          {/* border-r border-zinc-900 */}
           {/* Sidebar Tabs */}
-          <div className="flex">
+          <div className="flex border-r border-zinc-800 ">
             <button
               onClick={() => setLeftTab("chat")}
               className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-xs font-medium cursor-pointer ${leftTab === "chat" ? "text-zinc-300 " : "text-zinc-700 hover:text-zinc-300"}`}
@@ -92,7 +95,7 @@ function Workspace() {
           </div>
 
           {/* Sidebar Content */}
-          <div className="min-h-0 flex-1 overflow-hidden">
+          <div className="min-h-0 flex-1 overflow-hidden border-r border-zinc-800">
             {leftTab === "chat" ? (
               <ChatPanel
                 messages={activeProject.messages ?? []}
@@ -110,6 +113,21 @@ function Workspace() {
               />
             )}
           </div>
+        </div>
+
+        {/* Preview / Code Area */}
+        <div className="min-h-0 min-w-0 w-full flex-1 overflow-hidden">
+          {activeProject.status === "pending" ||
+          activeProject.status === "generating" ||
+          activeProject.status === "failed" ? (
+            <AgentProgressDashboard project={activeProject} />
+          ) : (
+            <PreviewPanel
+              project={activeProject}
+              activeFile={activeFile}
+              showCode={showCode}
+            />
+          )}
         </div>
       </div>
     </div>

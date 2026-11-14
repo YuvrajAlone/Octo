@@ -15,6 +15,7 @@ type WorkspaceHeaderProps = {
   onToggleShowCode: (value: boolean) => void;
   onOpenPreview: () => void;
   onDownload: () => void;
+  LeftTab: (tab: "chat" | "files") => void;
 };
 
 export default function WorkspaceHeader({
@@ -23,11 +24,12 @@ export default function WorkspaceHeader({
   onToggleShowCode,
   onOpenPreview,
   onDownload,
+  LeftTab,
 }: WorkspaceHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="relative z-40 grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-4 backdrop-blur-">
+    <header className="relative z-40 grid h-14 shrink-0 grid-cols-[1fr_auto_1fr] items-center px-4 border-b border-zinc-800">
       {/* Left - Logo & Brand */}
       <button
         onClick={() => router.push("/")}
@@ -55,7 +57,10 @@ export default function WorkspaceHeader({
       <div className="flex shrink-0 items-center justify-self-end gap-2">
         {/* Code / Preview */}
         <button
-          onClick={() => onToggleShowCode(true)}
+          onClick={() => {
+            LeftTab("files");
+            onToggleShowCode(true);
+          }}
           className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg  px-2 py-1.5 text-xs font-medium text-zinc-400 transition-opacity duration-200 hover:scale-110 hover:text-white/80"
         >
           {showCode ? (

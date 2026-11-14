@@ -1,4 +1,4 @@
-import { FileCodeIcon, FileTextIcon, FolderIcon } from "lucide-react";
+import { FileCodeCorner, FileTextIcon, FolderOpenIcon } from "lucide-react";
 import { useMemo } from "react";
 import type { ReactNode } from "react";
 
@@ -55,23 +55,19 @@ function buildTree(paths: string[]): FileNode[] {
 }
 
 function getFileIcon(name: string): ReactNode {
-  if (name.endsWith(".css")) {
-    return <FileTextIcon size={14} className="text-sky-400" />;
-  }
+  if (name.endsWith(".css"))
+    return <FileTextIcon size={14} className="text-zinc-400" />;
 
-  if (name.endsWith(".tsx") || name.endsWith(".ts")) {
-    return <FileCodeIcon size={14} className="text-blue-400" />;
-  }
+  if (name.endsWith(".tsx") || name.endsWith(".ts"))
+    return <FileCodeCorner size={14} className="text-zinc-400" />;
 
-  if (name.endsWith(".jsx") || name.endsWith(".js")) {
-    return <FileCodeIcon size={14} className="text-amber-400" />;
-  }
+  if (name.endsWith(".jsx") || name.endsWith(".js"))
+    return <FileCodeCorner size={14} className="text-zinc-400" />;
 
-  if (name.endsWith(".json")) {
-    return <FileTextIcon size={14} className="text-emerald-400" />;
-  }
+  if (name.endsWith(".json"))
+    return <FileTextIcon size={14} className="text-zinc-400" />;
 
-  return <FileTextIcon size={14} className="text-zinc-500" />;
+  return <FileTextIcon size={14} className="text-zinc-400" />;
 }
 
 function TreeItem({
@@ -89,8 +85,8 @@ function TreeItem({
           className="flex items-center gap-2 rounded-md py-1.5 pr-2 text-[12px] font-medium text-zinc-400 select-none"
           style={{ paddingLeft: `${depth * 12 + 12}px` }}
         >
-          <FolderIcon size={14} className="shrink-0 text-zinc-500" />
-          <span className="truncate">{node.name}</span>
+          <FolderOpenIcon size={14} className="shrink-0 text-zinc-500" />
+          <span className="truncate capitalize text-zinc-300">{node.name}</span>
         </div>
 
         {node.children.map((child) => (
@@ -135,11 +131,11 @@ const FileExplorer = ({
   return (
     <div className="flex h-full flex-col overflow-y-auto p-3 scrollbar-none">
       <div className="mb-2 flex items-center justify-between px-2">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-500">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-zinc-300">
           Explorer
         </p>
 
-        <span className="text-[10px] tabular-nums text-zinc-600">
+        <span className="text-[10px] tabular-nums text-zinc-300">
           {Object.keys(files).length} files
         </span>
       </div>

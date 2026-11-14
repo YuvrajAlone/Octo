@@ -1,7 +1,16 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import {
+  useMemo,
+  useEffect,
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import debounce from "lodash.debounce";
 
 type Message = {
   role: "user" | "assistant";
@@ -42,11 +51,13 @@ type AppContextType = {
   setShowCode: React.Dispatch<React.SetStateAction<boolean>>;
   chatLoading: boolean;
   handleChat: (prompt: string) => Promise<void>;
+  updateProjectFiles: (files: Record<string, string>) => void;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppContextProvider({ children }: { children: ReactNode }) {
+  const { isSignedIn } = useUser();
   const router = useRouter();
   const [chatLoading, setChatLoading] = useState(false);
   const [generatingProject, setGeneratingProject] = useState(false);
@@ -56,7 +67,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [activeProject, setActiveProject] = useState<Project | null>(null);
-  const [activeFile, setActiveFile] = useState("/App.js");
+  const [activeFile, setActiveFile] = useState("");
   const [loadingActiveProject, setLoadingActiveProject] = useState(false);
   const [showCode, setShowCode] = useState(false);
 
@@ -142,16 +153,6 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
       const data = await response.json();
 
       setActiveProject(data);
-
-      const files = Object.keys(data.files ?? {});
-
-      if (files.length > 0) {
-        setActiveFile((prev) => {
-          if (files.includes(prev)) return prev;
-          if (files.includes("/App.js")) return "/App.js";
-          return files[0];
-        });
-      }
     } catch (error) {
       console.error("Failed to load project:", error);
     } finally {
@@ -189,6 +190,36 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const debouncedSave = useMemo(
+    () =>
+      debounce(async (files: Record<string, string>, id: string) => {
+        try {
+          await fetch(`/api/projects/${id}/files`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ files }),
+          });
+        } catch (error) {
+          console.error("Failed to auto-save files:", error);
+        }
+      }, 1000),
+    [],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedSave.flush();
+    };
+  }, [debouncedSave]);
+
+  const updateProjectFiles = async (files: Record<string, string>) => {
+    if (!activeProject || !isSignedIn) return;
+
+    debouncedSave(files, activeProject.id);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -208,6 +239,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
         showCode,
         chatLoading,
         handleChat,
+        updateProjectFiles,
       }}
     >
       {children}

@@ -15,7 +15,7 @@ export async function DELETE(
 
 const initialProjects = [
   {
-    _id: "proj-1",
+    id: "proj-1",
     name: "SaaSify Landing Page",
     description:
       "A modern SaaS landing page with dark mode accents, hero section, bento grid features, pricing table, and testimonials.",
@@ -264,7 +264,7 @@ body {
     },
   },
   {
-    _id: "proj-2",
+    id: "proj-2",
     name: "Personal Portfolio",
     description:
       "Minimalist personal portfolio website for designers and developers.",
@@ -318,7 +318,7 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const project = initialProjects.find((project) => project._id === id);
+  const project = initialProjects.find((project) => project.id === id);
 
   if (!project) {
     return NextResponse.json({ message: "Project not found" }, { status: 404 });
