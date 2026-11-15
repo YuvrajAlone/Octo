@@ -2,7 +2,7 @@
 
 import { useAppContext } from "@/src/context/AppContext";
 import { useParams } from "next/navigation";
-import { Loader, MessageCircle, Folders } from "lucide-react";
+import { Loader } from "lucide-react";
 import WorkspaceHeader from "@/src/components/WorkspaceHeader";
 import { useEffect, useState } from "react";
 import { Suspense } from "react";
@@ -72,7 +72,9 @@ function Workspace() {
         LeftTab={() =>
           setLeftTab((prev) => (prev === "files" ? "chat" : "files"))
         }
-      ></WorkspaceHeader>
+        setActiveFile={setActiveFile}
+        appFile={activeProject.files["/App.js"] ? "/App.js" : "/App.ts"}
+      />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left Sidebar */}
@@ -81,16 +83,16 @@ function Workspace() {
           <div className="flex border-r border-zinc-800 ">
             <button
               onClick={() => setLeftTab("chat")}
-              className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-xs font-medium cursor-pointer ${leftTab === "chat" ? "text-zinc-300 " : "text-zinc-700 hover:text-zinc-300"}`}
+              className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-xs font-medium cursor-pointer ${leftTab === "chat" ? "text-zinc-300 border-b-2 border-zinc-500" : "text-zinc-700 hover:text-zinc-300"}`}
             >
-              <MessageCircle size={13} /> Chat
+              Chat
             </button>
 
             <button
               onClick={() => setLeftTab("files")}
-              className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-xs font-medium cursor-pointer ${leftTab === "files" ? "text-zinc-300 " : "text-zinc-700 hover:text-zinc-300"}`}
+              className={`flex-1 flex items-center justify-center gap-1 py-2.5 text-xs font-medium cursor-pointer ${leftTab === "files" ? "text-zinc-300 border-b-2 border-zinc-500" : "text-zinc-700 hover:text-zinc-300"}`}
             >
-              <Folders size={13} /> Files
+              Files
             </button>
           </div>
 

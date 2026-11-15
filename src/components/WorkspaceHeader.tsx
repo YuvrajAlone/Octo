@@ -16,6 +16,8 @@ type WorkspaceHeaderProps = {
   onOpenPreview: () => void;
   onDownload: () => void;
   LeftTab: (tab: "chat" | "files") => void;
+  setActiveFile: React.Dispatch<React.SetStateAction<string>>;
+  appFile: string;
 };
 
 export default function WorkspaceHeader({
@@ -25,6 +27,8 @@ export default function WorkspaceHeader({
   onOpenPreview,
   onDownload,
   LeftTab,
+  setActiveFile,
+  appFile,
 }: WorkspaceHeaderProps) {
   const router = useRouter();
 
@@ -60,6 +64,7 @@ export default function WorkspaceHeader({
           onClick={() => {
             LeftTab("files");
             onToggleShowCode(true);
+            setActiveFile((prev) => (prev === appFile ? "" : appFile));
           }}
           className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg  px-2 py-1.5 text-xs font-medium text-zinc-400 transition-opacity duration-200 hover:scale-110 hover:text-white/80"
         >
